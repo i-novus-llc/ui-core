@@ -14,9 +14,7 @@
         "@i-novus/license-checker": "0.0.7"
     },
     "resolutions": {
-        "map-stream": "0.0.5",
-        "stylelint-config-standard": "33.0.0",
-        "stylelint-config-recommended-scss": "12.0.0"
+        "map-stream": "0.0.5"
     },
     "engines": {
         "npm": "please-use-yarn",
