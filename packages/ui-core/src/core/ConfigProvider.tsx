@@ -29,9 +29,7 @@ export const useConfigProvider = () => {
     return {
         ...context,
         getPrefix: (prefix?: string) => {
-            if (prefix) {
-                return prefix
-            }
+            if (prefix) { return prefix }
 
             return context.prefix
         },
