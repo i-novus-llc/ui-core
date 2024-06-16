@@ -14,7 +14,7 @@ export interface PaperProps extends ComponentBaseProps, HTMLAttributes<HTMLDivEl
     bottomLeftRadius?: BorderRadiusSize,
     bottomRightRadius?: BorderRadiusSize,
     direction?: 'vertical' | 'horizontal',
-    display?: 'flex' | 'grid' | 'block' | 'inline-block' | 'inline-flex',
+    display?: 'flex' | 'grid' | 'block' | 'inline-block' | 'inline-flex' | 'none',
     fullWidth?: boolean,
     gap?: ScaleSize,
     height?: 'auto' | 'min-content' | 'max-content' | string | number,
