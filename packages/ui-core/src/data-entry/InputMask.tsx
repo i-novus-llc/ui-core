@@ -1,4 +1,4 @@
-import { forwardRef, FocusEvent, useState, useRef, useCallback, useEffect } from 'react'
+import { forwardRef, FocusEvent, useState, useRef, useCallback, useEffect, MouseEvent } from 'react'
 import { IMask, useIMask } from 'react-imask'
 import { ReactMaskOpts, UnmaskValue } from 'react-imask/mixin'
 
@@ -22,6 +22,7 @@ export const InputMask = forwardRef<HTMLInputElement, InputMaskProps>((props, re
         onChange,
         onComplete,
         onBlur,
+        onReset: onResetExternal,
         ...restProps
     } = props
 
@@ -53,11 +54,12 @@ export const InputMask = forwardRef<HTMLInputElement, InputMaskProps>((props, re
         onComplete: handleComplete,
     })
 
-    const onReset = useCallback(() => {
+    const onReset = useCallback((event: MouseEvent<HTMLButtonElement>) => {
         setValue('')
 
         lastCompletedValueRef.current = null
-    }, [setValue])
+        onResetExternal?.(event)
+    }, [setValue, onResetExternal])
 
     const handleBlur = useCallback((event: FocusEvent<HTMLInputElement>) => {
         if (maskRef.current?.masked.value && !maskRef.current?.masked.isComplete) {
