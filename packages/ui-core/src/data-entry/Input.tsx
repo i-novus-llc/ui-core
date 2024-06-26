@@ -9,7 +9,7 @@ import {
     FocusEvent,
     useMemo,
     useState,
-    useLayoutEffect,
+    useEffect,
 } from 'react'
 import classNames from 'classnames'
 import { v4 as generateId } from 'uuid'
@@ -103,7 +103,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 
     const targetId = useMemo(() => generateId(), [])
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (isControlled.current) {
             setClearIconVisible(Boolean(props.value))
         } else {
