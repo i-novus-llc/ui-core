@@ -1,4 +1,4 @@
-import { ChangeEvent, MouseEvent, forwardRef, HTMLProps, useCallback } from 'react'
+import { ChangeEvent, MouseEvent, forwardRef, HTMLProps, useCallback, ReactNode, useMemo } from 'react'
 import RCTextarea from 'rc-textarea'
 import classNames from 'classnames'
 
@@ -10,6 +10,7 @@ import { AbstractInputProps } from './Input'
 interface TextAreaProps extends Omit<HTMLProps<HTMLTextAreaElement>, 'onBlur' | 'onFocus' | 'onChange' | 'onResize' | 'value'>,
     ComponentBaseProps, AbstractInputProps<string, HTMLTextAreaElement> {
     autoSize?: boolean | { maxRows?: number, minRows?: number },
+    clearIcon?: boolean | { icon: ReactNode },
     error?: boolean
 }
 
@@ -24,6 +25,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>((props, r
         style,
         prefix,
         autoSize = false,
+        clearIcon = true,
         ...restProps
     } = props
 
@@ -41,6 +43,12 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>((props, r
         // @ts-ignore
         onChange?.('', event)
     }, [onChange])
+
+    const icon = typeof clearIcon === 'object' ? clearIcon.icon : <CloseIcon />
+
+    const isShowClearIcon = useMemo(() => (
+        Boolean(!disabled && clearIcon && value)
+    ), [clearIcon, disabled, value])
 
     return (
         <div
@@ -62,14 +70,14 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>((props, r
                 {...restProps}
             />
 
-            {value && (
+            {isShowClearIcon && (
                 <Button
                     aria-label="Очистить"
                     disabled={disabled}
                     onClick={clearValue}
                     variant="link"
                     className={classNames('btn-xs', `${prefixCls}-textArea__clear-button`)}
-                    icon={<CloseIcon />}
+                    icon={icon}
                 />
             )}
         </div>
