@@ -39,8 +39,8 @@ export const OptionList = ({
     return (
         <ul className={`${prefix}-options`} onMouseLeave={onMouseLeave} onMouseEnter={onMouseEnter} ref={listContainerRef}>
             {options.map((option) => {
-                const { id, value: optionValue, label, disabled = false } = option
-                const isSelected = selected.some(selectedOption => selectedOption.value === optionValue)
+                const { id, label, disabled = false } = option
+                const isSelected = selected.some(selectedOption => selectedOption.id === id)
 
                 return (
                     <li
