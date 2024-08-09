@@ -37,8 +37,11 @@ const getMonthShortName = (locale: string | undefined, date: Date) => {
 }
 
 const TODAY = new Date()
+const BEGINNING_OF_CENTURY = new Date('1900').getFullYear()
+
 const DEFAULT_VIEW: CalendarView = 'month'
-const MIN_YEAR = TODAY.getFullYear() - 100
+
+const MIN_YEAR = BEGINNING_OF_CENTURY
 const MAX_YEAR = TODAY.getFullYear() + 100
 
 type Time = TimePickerProps['value']
