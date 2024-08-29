@@ -72,7 +72,7 @@
         "react-dom": ">=17.0.0"
     },
     "devDependencies": {
-        "@i-novus/eslint-config": "1.0.10",
+        "@i-novus/eslint-config": "1.0.19",
         "@types/lodash": "4.17.0",
         "@types/node": "^18.19.22",
         "@types/react": "^18.2.64",

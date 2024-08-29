@@ -2,7 +2,7 @@ import { Dayjs } from 'dayjs'
 import { useCallback } from 'react'
 
 import { INTERVAL_SEPARATOR, OUTPUT_FORMAT } from '../../../const'
-import { getValidDayjs } from '../../../dayjs-utils/getValid'
+import { getValidDayjs } from '../../../dayjs-utils'
 
 type RangeValue = {
     begin: string | null,

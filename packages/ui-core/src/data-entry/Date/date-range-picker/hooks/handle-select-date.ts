@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useState } from 'react'
 
-import { getValidDayjs } from '../../../dayjs-utils/getValid'
+import { getValidDayjs } from '../../../dayjs-utils'
 import { OUTPUT_FORMAT } from '../../../const'
 
 type Range = {

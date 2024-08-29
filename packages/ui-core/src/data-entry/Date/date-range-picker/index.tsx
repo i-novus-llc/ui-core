@@ -11,7 +11,7 @@ import { CalendarIcon, ComponentBaseProps, useConfigProvider } from '../../../co
 import { InputProps } from '../../Input'
 import { InputMask } from '../../InputMask'
 import { dateRangePicker } from '../../config/mask'
-import { getValidDayjs } from '../../dayjs-utils/getValid'
+import { getValidDayjs } from '../../dayjs-utils'
 import { DATE_FORMAT, INTERVAL_SEPARATOR, TODAY } from '../../const'
 import { EChangeType, OnSelectFunc } from '../../../data-display/Calendar/types'
 import { useDatePickerInputEvents } from '../hooks/date-picker-input-events'

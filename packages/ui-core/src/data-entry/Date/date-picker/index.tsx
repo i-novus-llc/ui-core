@@ -1,4 +1,4 @@
-import { FocusEvent, forwardRef, useCallback, useEffect, useMemo, useState } from 'react'
+import { FocusEvent, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import classNames from 'classnames'
@@ -12,7 +12,7 @@ import { PopoverPlacement } from '../../../data-display/Popover/types'
 import { InputMask } from '../../InputMask'
 import { CalendarView, EChangeType, type OnSelectFunc as HandleSelectDate } from '../../../data-display/Calendar/types'
 import { datePicker } from '../../config/mask'
-import { getValidDayjs } from '../../dayjs-utils/getValid'
+import { getValidDayjs, dateLimiter, type DateLimit } from '../../dayjs-utils'
 import { DATE_FORMAT, OUTPUT_FORMAT, TODAY } from '../../const'
 import { useDatePickerInputEvents } from '../hooks/date-picker-input-events'
 import { FocusTrap } from '../../../core/components/focus-trap'
@@ -65,6 +65,15 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
         ...restProps
     } = props
     const inputRef = useForwardedRef<HTMLInputElement>(ref)
+    const valueLimiterRef = useRef<DateLimit>('date')
+
+    if (dateFormat === 'MM.YYYY') {
+        valueLimiterRef.current = 'month'
+    } else if (timeFormat) {
+        valueLimiterRef.current = 'time'
+    } else {
+        valueLimiterRef.current = 'date'
+    }
 
     const [calendarOpen, setCalendarOpen] = useState(false)
 
@@ -89,7 +98,8 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
     // #region calendar data
 
     const { calendarValue, inputValue } = useMemo(() => {
-        const date = getValidDayjs(value)
+        const dateRaw = getValidDayjs(value)
+        const date = dateLimiter(dateRaw, valueLimiterRef.current)
 
         if (date) {
             return ({
@@ -99,19 +109,20 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
         }
 
         return ({
-            calendarValue: TODAY.toDate(),
+            calendarValue: (dateLimiter(TODAY, valueLimiterRef.current) || TODAY).toDate(),
             inputValue: null,
         })
     }, [fullFormat, value])
-    const minDate = useMemo(() => getValidDayjs(min), [min])
-    const maxDate = useMemo(() => getValidDayjs(max), [max])
+    const minDate = useMemo(() => dateLimiter(getValidDayjs(min), valueLimiterRef.current), [min])
+    const maxDate = useMemo(() => dateLimiter(getValidDayjs(max), valueLimiterRef.current), [max])
 
     // #endregion
 
     // #region calendar handlers
 
     const handleSelectDate = useCallback<HandleSelectDate>((newDate, { changedType }) => {
-        const date = getValidDayjs(newDate)?.format(OUTPUT_FORMAT) || null
+        const newDateLimited = dateLimiter(getValidDayjs(newDate), valueLimiterRef.current)
+        const date = newDateLimited?.format(OUTPUT_FORMAT) || null
 
         if (changedType !== EChangeType.TIME) {
             onCloseCalendar()
@@ -124,7 +135,15 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
 
     // #region input handlers
 
-    const handleComplete = useHandleInputCompleteHook(onChange, { min: minDate, max: maxDate, format: fullFormat })
+    const handleComplete = useHandleInputCompleteHook(
+        onChange,
+        {
+            min: minDate,
+            max: maxDate,
+            format: fullFormat,
+            dateLimit: valueLimiterRef.current,
+        },
+    )
 
     const onFocusCallback = useCallback((event: FocusEvent<HTMLInputElement, Element>) => {
         onOpenCalendar()

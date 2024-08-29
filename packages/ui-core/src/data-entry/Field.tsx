@@ -6,6 +6,7 @@ import { ComponentBaseProps, useConfigProvider } from '../core'
 export interface FieldProps extends Omit<ComponentBaseProps, 'children'> {
     children?: ReactElement,
     error?: string,
+    errorClassName?: string,
     errorStyle?: CSSProperties,
     inputStyle?: CSSProperties,
     label?: ReactNode,
@@ -26,6 +27,7 @@ export const Field: FC<FieldProps> = ({
     labelStyle,
     labelPosition = 'top-left',
     labelClassName,
+    errorClassName,
     errorStyle,
     inputStyle,
     visible = true,
@@ -57,7 +59,7 @@ export const Field: FC<FieldProps> = ({
             )}
 
             {error && (
-                <span className={`${prefixCls}-field__error`} style={errorStyle}>{error}</span>
+                <span className={classNames(errorClassName, `${prefixCls}-field__error`)} style={errorStyle}>{error}</span>
             )}
 
             {Children.map(children, (child) => {

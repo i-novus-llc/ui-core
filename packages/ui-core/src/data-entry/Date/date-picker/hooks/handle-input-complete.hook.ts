@@ -2,7 +2,7 @@ import { Dayjs } from 'dayjs'
 import { useCallback } from 'react'
 
 import { OUTPUT_FORMAT } from '../../../const'
-import { getValidDayjs } from '../../../dayjs-utils/getValid'
+import { getValidDayjs, dateLimiter, type DateLimit } from '../../../dayjs-utils'
 
 type Callback = (value: string | null) => void
 
@@ -10,6 +10,7 @@ type Config = {
     format: string,
     max: Dayjs | null
     min: Dayjs | null
+    dateLimit: DateLimit
 }
 
 type Limiter = {
@@ -17,9 +18,11 @@ type Limiter = {
     min: Dayjs | null
 }
 
-const prepareValue = (value: string, limiter: Limiter, format: string) => {
-    const date = getValidDayjs(value, format)
+const prepareValue = (value: string, limiter: Limiter, format: string, dateLimit: DateLimit) => {
+    let date = getValidDayjs(value, format)
     const { min, max } = limiter
+
+    date = dateLimiter(date, dateLimit)
 
     if (!date) {
         return null
@@ -37,13 +40,13 @@ const prepareValue = (value: string, limiter: Limiter, format: string) => {
 }
 
 export const useHandleInputCompleteHook = (callback: Callback, config: Config) => {
-    const { min, max, format } = config
+    const { min, max, format, dateLimit } = config
 
     return (
         useCallback((value: string) => {
-            const validISODateString = prepareValue(value, { min, max }, format)
+            const validISODateString = prepareValue(value, { min, max }, format, dateLimit)
 
             callback(validISODateString)
-        }, [min, max, format, callback])
+        }, [min, max, format, dateLimit, callback])
     )
 }
