@@ -12,6 +12,7 @@ export const TimePicker: FC<TimePickerProps> = ({
     prefix,
     onChange,
     value,
+    dateAccuracy,
 }) => {
     const handleSelectHours = useCallback((data: string) => {
         onChange({ ...value, hours: data })
@@ -46,14 +47,16 @@ export const TimePicker: FC<TimePickerProps> = ({
                     expandIconVisibility={false}
                 />
 
-                <CalendarSelect
-                    className="timepicker"
-                    prefix={prefix}
-                    initialValue={value.seconds?.padStart(2, '0')}
-                    options={MINUTES_SECONDS}
-                    onSelectOption={handleSelectSeconds}
-                    expandIconVisibility={false}
-                />
+                {dateAccuracy === 'full' && (
+                    <CalendarSelect
+                        className="timepicker"
+                        prefix={prefix}
+                        initialValue={value.seconds?.padStart(2, '0')}
+                        options={MINUTES_SECONDS}
+                        onSelectOption={handleSelectSeconds}
+                        expandIconVisibility={false}
+                    />
+                )}
             </div>
         </div>
     )
