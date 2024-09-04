@@ -2,15 +2,15 @@ import { Dayjs } from 'dayjs'
 import { useCallback } from 'react'
 
 import { OUTPUT_FORMAT } from '../../../const'
-import { getValidDayjs, dateLimiter, type DateLimit } from '../../../dayjs-utils'
+import { getValidDayjs, cutDateByAccuracy, type DateAccuracy } from '../../../dayjs-utils'
 
 type Callback = (value: string | null) => void
 
 type Config = {
-    format: string,
+    format: string
     max: Dayjs | null
     min: Dayjs | null
-    dateLimit: DateLimit
+    dateAccuracy: DateAccuracy
 }
 
 type Limiter = {
@@ -18,11 +18,11 @@ type Limiter = {
     min: Dayjs | null
 }
 
-const prepareValue = (value: string, limiter: Limiter, format: string, dateLimit: DateLimit) => {
+const prepareValue = (value: string, limiter: Limiter, format: string, dateAccuracy: DateAccuracy) => {
     let date = getValidDayjs(value, format)
     const { min, max } = limiter
 
-    date = dateLimiter(date, dateLimit)
+    date = cutDateByAccuracy(date, dateAccuracy)
 
     if (!date) {
         return null
@@ -40,13 +40,13 @@ const prepareValue = (value: string, limiter: Limiter, format: string, dateLimit
 }
 
 export const useHandleInputCompleteHook = (callback: Callback, config: Config) => {
-    const { min, max, format, dateLimit } = config
+    const { min, max, format, dateAccuracy } = config
 
     return (
         useCallback((value: string) => {
-            const validISODateString = prepareValue(value, { min, max }, format, dateLimit)
+            const validISODateString = prepareValue(value, { min, max }, format, dateAccuracy)
 
             callback(validISODateString)
-        }, [min, max, format, dateLimit, callback])
+        }, [min, max, format, dateAccuracy, callback])
     )
 }

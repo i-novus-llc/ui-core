@@ -11,7 +11,7 @@ import { CalendarIcon, ComponentBaseProps, useConfigProvider } from '../../../co
 import { InputProps } from '../../Input'
 import { InputMask } from '../../InputMask'
 import { dateRangePicker } from '../../config/mask'
-import { getValidDayjs } from '../../dayjs-utils'
+import { getDateAccuracy, getValidDayjs } from '../../dayjs-utils'
 import { DATE_FORMAT, INTERVAL_SEPARATOR, TODAY } from '../../const'
 import { EChangeType, OnSelectFunc } from '../../../data-display/Calendar/types'
 import { useDatePickerInputEvents } from '../hooks/date-picker-input-events'
@@ -81,6 +81,7 @@ export const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps
 
     const fullFormat = useMemo(() => [dateFormat, timeFormat].filter(Boolean).join(' '), [dateFormat, timeFormat])
     const maskConfig = useMemo(() => dateRangePicker(fullFormat, INTERVAL_SEPARATOR), [fullFormat])
+    const dateAccuracy = getDateAccuracy(dateFormat, timeFormat)
 
     // #endregion
 
@@ -254,7 +255,7 @@ export const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps
                                         onSelect={handleSelectBegin}
                                         activeStartDate={calendarValue.begin}
                                         maxDate={beginMaxDate}
-                                        showTimePicker={Boolean(timeFormat)}
+                                        dateAccuracy={dateAccuracy}
                                         {...beginCalendarProps}
                                     />
                                     <Calendar
@@ -263,7 +264,7 @@ export const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps
                                         onSelect={handleSelectEnd}
                                         activeStartDate={calendarValue.end}
                                         minDate={endMinDate}
-                                        showTimePicker={Boolean(timeFormat)}
+                                        dateAccuracy={dateAccuracy}
                                         {...endCalendarProps}
                                     />
                                 </Paper>

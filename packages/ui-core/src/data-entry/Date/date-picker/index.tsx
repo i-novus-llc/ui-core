@@ -12,7 +12,7 @@ import { PopoverPlacement } from '../../../data-display/Popover/types'
 import { InputMask } from '../../InputMask'
 import { CalendarView, EChangeType, type OnSelectFunc as HandleSelectDate } from '../../../data-display/Calendar/types'
 import { datePicker } from '../../config/mask'
-import { getValidDayjs, dateLimiter, type DateLimit } from '../../dayjs-utils'
+import { getValidDayjs, type DateAccuracy, getDateAccuracy, cutDateByAccuracy } from '../../dayjs-utils'
 import { DATE_FORMAT, OUTPUT_FORMAT, TODAY } from '../../const'
 import { useDatePickerInputEvents } from '../hooks/date-picker-input-events'
 import { FocusTrap } from '../../../core/components/focus-trap'
@@ -65,15 +65,9 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
         ...restProps
     } = props
     const inputRef = useForwardedRef<HTMLInputElement>(ref)
-    const valueLimiterRef = useRef<DateLimit>('date')
+    const dateAccuracyRef = useRef<DateAccuracy>('day')
 
-    if (dateFormat === 'MM.YYYY') {
-        valueLimiterRef.current = 'month'
-    } else if (timeFormat) {
-        valueLimiterRef.current = 'time'
-    } else {
-        valueLimiterRef.current = 'date'
-    }
+    dateAccuracyRef.current = getDateAccuracy(dateFormat, timeFormat)
 
     const [calendarOpen, setCalendarOpen] = useState(false)
 
@@ -99,7 +93,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
 
     const { calendarValue, inputValue } = useMemo(() => {
         const dateRaw = getValidDayjs(value)
-        const date = dateLimiter(dateRaw, valueLimiterRef.current)
+        const date = cutDateByAccuracy(dateRaw, dateAccuracyRef.current)
 
         if (date) {
             return ({
@@ -109,19 +103,19 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
         }
 
         return ({
-            calendarValue: (dateLimiter(TODAY, valueLimiterRef.current) || TODAY).toDate(),
+            calendarValue: (cutDateByAccuracy(TODAY, dateAccuracyRef.current) || TODAY).toDate(),
             inputValue: null,
         })
     }, [fullFormat, value])
-    const minDate = useMemo(() => dateLimiter(getValidDayjs(min), valueLimiterRef.current), [min])
-    const maxDate = useMemo(() => dateLimiter(getValidDayjs(max), valueLimiterRef.current), [max])
+    const minDate = useMemo(() => cutDateByAccuracy(getValidDayjs(min), dateAccuracyRef.current), [min])
+    const maxDate = useMemo(() => cutDateByAccuracy(getValidDayjs(max), dateAccuracyRef.current), [max])
 
     // #endregion
 
     // #region calendar handlers
 
     const handleSelectDate = useCallback<HandleSelectDate>((newDate, { changedType }) => {
-        const newDateLimited = dateLimiter(getValidDayjs(newDate), valueLimiterRef.current)
+        const newDateLimited = cutDateByAccuracy(getValidDayjs(newDate), dateAccuracyRef.current)
         const date = newDateLimited?.format(OUTPUT_FORMAT) || null
 
         if (changedType !== EChangeType.TIME) {
@@ -141,7 +135,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
             min: minDate,
             max: maxDate,
             format: fullFormat,
-            dateLimit: valueLimiterRef.current,
+            dateAccuracy: dateAccuracyRef.current,
         },
     )
 
@@ -209,7 +203,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
                                     onSelect={handleSelectDate}
                                     activeStartDate={calendarValue}
                                     view={calendarView}
-                                    showTimePicker={Boolean(timeFormat)}
+                                    dateAccuracy={dateAccuracyRef.current}
                                     {...calendarProps}
                                 />
                             </FocusTrap>

@@ -71,7 +71,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) =
         onMouseLeave,
         minDate,
         maxDate,
-        showTimePicker,
+        dateAccuracy,
     } = props
 
     const { getPrefix } = useConfigProvider()
@@ -83,6 +83,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) =
     const [calendarInitialDate, setCalendarInitialDate] = useState<Date>(activeStartDate || TODAY)
     const [userSelectedDate, setUserSelectedDate] = useState<Date>(activeStartDate || TODAY)
     const [time, setTime] = useState<Time>({ hours: '0', minutes: '0', seconds: '0' })
+    const showTimePicker = !!dateAccuracy && ['minute', 'full'].includes(dateAccuracy)
 
     // #region date select handlers
 
@@ -179,6 +180,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) =
                     prefix={prefixCls}
                     value={time}
                     onChange={handleChangeTime}
+                    dateAccuracy={dateAccuracy}
                 />
             )}
         </div>

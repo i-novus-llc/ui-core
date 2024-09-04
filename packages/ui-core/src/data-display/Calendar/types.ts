@@ -2,6 +2,7 @@ import { CalendarProps as BaseCalendarProps } from 'react-calendar'
 import { ButtonHTMLAttributes, HTMLAttributes, MouseEvent, MutableRefObject } from 'react'
 
 import { ComponentBaseProps } from '../../core'
+import { type DateAccuracy } from '../../data-entry/dayjs-utils'
 
 type OnArgs = Parameters<NonNullable<BaseCalendarProps['onActiveStartDateChange']>>[0]
 
@@ -16,12 +17,12 @@ export enum EChangeType {
 }
 export type OnSelectFunc = (date: Date | null, meta: { changedType: EChangeType }) => void
 export interface CalendarProps extends Omit<ComponentBaseProps, 'children' | 'visible' | 'disabled'>, HTMLEvents {
-    activeStartDate?: Date | null,
-    locale?: string,
-    maxDate?: Date,
-    minDate?: Date,
-    onSelect?: OnSelectFunc,
-    showTimePicker?: boolean,
+    activeStartDate?: Date | null
+    locale?: string
+    maxDate?: Date
+    minDate?: Date
+    onSelect?: OnSelectFunc
+    dateAccuracy?: DateAccuracy
     view?: CalendarView
 }
 
@@ -40,12 +41,13 @@ export type MonthViewNavigationProps = Omit<NavigationProps, 'view'>
 export type YearViewNavigationProps = Omit<NavigationProps, 'view'>
 export type TimePickerProps = {
     onChange(data: TimePickerProps['value']): void,
-    prefix: string,
+    prefix: string
+    dateAccuracy?: DateAccuracy
     value: {
         hours: string
         minutes: string
         seconds: string
-    },
+    }
 }
 
 export type CalendarSelectOptionType = string
