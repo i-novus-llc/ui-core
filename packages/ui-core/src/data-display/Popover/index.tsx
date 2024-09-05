@@ -6,6 +6,7 @@ import { Content } from './Content'
 import { Footer } from './Footer'
 import { PopoverProps } from './types'
 
+export * from './types'
 export const Popover = Body as CompoundComponent<PopoverProps, {
     Content: typeof Content,
     Footer: typeof Footer,
