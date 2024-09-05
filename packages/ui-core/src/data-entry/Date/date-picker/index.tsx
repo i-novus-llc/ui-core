@@ -115,7 +115,17 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
     // #region calendar handlers
 
     const handleSelectDate = useCallback<HandleSelectDate>((newDate, { changedType }) => {
-        const newDateLimited = cutDateByAccuracy(getValidDayjs(newDate), dateAccuracyRef.current)
+        let newValue = getValidDayjs(newDate)
+
+        if (newValue && minDate && newValue < minDate) {
+            newValue = minDate
+        }
+
+        if (newValue && maxDate && newValue > maxDate) {
+            newValue = maxDate
+        }
+
+        const newDateLimited = cutDateByAccuracy(newValue, dateAccuracyRef.current)
         const date = newDateLimited?.format(OUTPUT_FORMAT) || null
 
         if (changedType !== EChangeType.TIME) {
@@ -123,7 +133,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
         }
 
         onChange(date)
-    }, [onChange, onCloseCalendar])
+    }, [onChange, onCloseCalendar, minDate, maxDate])
 
     // #endregion
 
