@@ -3,10 +3,11 @@ import classNames from 'classnames'
 
 import { useConfigProvider } from '../../core'
 
-import { OptionList, TagList } from './components'
+import { OptionList } from './components'
 import { BaseDropdownProps, TOption } from './types'
 import { defaultOptions, noOption } from './constants'
 import { DropdownInput } from './DropdownInput'
+import { MultipleSelector } from './MultipleSelector'
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export const Select = forwardRef<HTMLInputElement, BaseDropdownProps<unknown>>((props, ref) => {
@@ -92,7 +93,7 @@ export const Select = forwardRef<HTMLInputElement, BaseDropdownProps<unknown>>((
             setSelectedOptions(value)
         } else if (value && typeof value === 'object' && 'label' in value) {
             setSelectedOptions([value as TOption<unknown>])
-            setInputValue(value.label as string)
+            setInputValue((value as TOption<unknown>).label)
         } else {
             setSelectedOptions([])
             setInputValue('')
@@ -101,7 +102,46 @@ export const Select = forwardRef<HTMLInputElement, BaseDropdownProps<unknown>>((
 
     useEffect(() => { setDropdownOptions(options) }, [options, loading])
 
+    const handleClearAllSelectedOptions = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation()
+
+        onInputValueChange('')
+        setSelectedOptions(defaultOptions)
+        // @ts-ignore
+        onChange?.(defaultOptions, event)
+    }, [onInputValueChange, onChange])
+
     if (!visible) { return null }
+
+    if (multiple) {
+        return (
+            <div className={classNames(className, `${prefixCls}-multiple-selector`)} style={style}>
+                <MultipleSelector
+                    {...restProps}
+                    disableInput
+                    disabled={disabled}
+                    ref={ref}
+                    prefixCls={prefixCls}
+                    value={inputValue}
+                    onChange={onInputValueChange}
+                    onOpen={handleOpen}
+                    dropdownInnerComponent={OptionList}
+                    dropdownInnerComponentProps={{
+                        options: dropdownOptions,
+                        selected: selectedOptions,
+                        onOptionClick,
+                        multiple,
+                        onScroll,
+                    }}
+                    tagListProps={{
+                        selectedOptions,
+                        onCloseTag,
+                        handleClearAllSelectedOptions,
+                    }}
+                />
+            </div>
+        )
+    }
 
     return (
         <div className={classNames(className, `${prefixCls}-select`)} style={style}>
@@ -125,17 +165,6 @@ export const Select = forwardRef<HTMLInputElement, BaseDropdownProps<unknown>>((
                     onScroll,
                 }}
             />
-            {multiple && Boolean(selectedOptions.length)
-                ? (
-                    <TagList
-                        className={classNames({ disabled })}
-                        prefix={prefixCls}
-                        selectedOptions={selectedOptions}
-                        onCloseTag={onCloseTag}
-                        disabled={disabled}
-                    />
-                )
-                : null}
         </div>
     )
 })

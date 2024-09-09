@@ -100,10 +100,25 @@ export type DropdownInputProps<TValue> = Omit<BaseDropdownProps<TValue>, 'onChan
     value?: string
 }
 
+export type MultipleSelectorProps<TValue> = DropdownInputProps<TValue> & {
+    tagListProps: TagListProps<TValue> & {
+        handleClearAllSelectedOptions?(event: MouseEvent<HTMLButtonElement>): void
+    }
+}
+
 export type InputSuffixIconProps = {
     className?: string,
     disabled?: boolean,
     error?: boolean,
     loading?: boolean,
     onClick(event: MouseEvent<HTMLButtonElement>): void
+}
+
+export type ClearButtonProps = {
+    className?: string,
+    clearIcon?: boolean | { icon: ReactNode },
+    disabled?: boolean
+    error?: boolean,
+    onClick(event: MouseEvent<HTMLButtonElement>): void,
+    visible: boolean
 }
