@@ -3,10 +3,11 @@ import classNames from 'classnames'
 
 import { useConfigProvider } from '../../core'
 
-import { OptionList, TagList } from './components'
+import { OptionList } from './components'
 import { BaseDropdownProps, TOption } from './types'
 import { defaultOptions, noOption, noOptions } from './constants'
 import { DropdownInput } from './DropdownInput'
+import { MultipleSelector } from './MultipleSelector'
 
 // FIXME: Требуется отсмотреть компоненту. Собрать корнер кейсы и провести рефакторинг. Внутри слишком много внутренних состояний.
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -113,6 +114,15 @@ export const InputSelect = forwardRef<HTMLInputElement, BaseDropdownProps<unknow
         setDropdownOptions(options)
     }, [onOpen, options])
 
+    const handleClearAllSelectedOptions = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation()
+
+        onInputValueChange('')
+        setSelectedOptions(defaultOptions)
+        // @ts-ignore
+        onChange?.(defaultOptions, event)
+    }, [onInputValueChange, onChange])
+
     useEffect(() => {
         if (Array.isArray(value)) {
             setSelectedOptions(value)
@@ -136,6 +146,36 @@ export const InputSelect = forwardRef<HTMLInputElement, BaseDropdownProps<unknow
         return null
     }
 
+    if (multiple) {
+        return (
+            <div className={classNames(className, `${prefixCls}-multiple-selector`)} style={style}>
+                <MultipleSelector
+                    {...restProps}
+                    disabled={disabled}
+                    ref={ref}
+                    prefixCls={prefixCls}
+                    value={inputValue}
+                    onChange={onInputValueChange}
+                    onOpen={handleOpen}
+                    dropdownInnerComponent={OptionList}
+                    onClose={onCloseDropdown}
+                    dropdownInnerComponentProps={{
+                        options: dropdownOptions,
+                        selected: selectedOptions,
+                        onOptionClick,
+                        multiple,
+                        onScroll,
+                    }}
+                    tagListProps={{
+                        selectedOptions,
+                        onCloseTag,
+                        handleClearAllSelectedOptions,
+                    }}
+                />
+            </div>
+        )
+    }
+
     return (
         <div className={classNames(className, `${prefixCls}-input-select`)} style={style}>
             <DropdownInput
@@ -156,18 +196,6 @@ export const InputSelect = forwardRef<HTMLInputElement, BaseDropdownProps<unknow
                     onScroll,
                 }}
             />
-
-            {multiple && Boolean(selectedOptions.length)
-                ? (
-                    <TagList
-                        className={classNames({ disabled })}
-                        prefix={prefixCls}
-                        selectedOptions={selectedOptions}
-                        onCloseTag={onCloseTag}
-                        disabled={disabled}
-                    />
-                )
-                : null}
         </div>
     )
 })
