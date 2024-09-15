@@ -1,8 +1,8 @@
-import { forwardRef, FocusEvent, useState, useRef, useCallback, useEffect, MouseEvent } from 'react'
+import { forwardRef, FocusEvent, useRef, useEffect, MouseEvent, memo } from 'react'
 import { IMask, useIMask } from 'react-imask'
 import { ReactMaskOpts, UnmaskValue } from 'react-imask/mixin'
 
-import { useComposeRef } from '../core/hooks/useComposeRef'
+import { useComposeRef, useMemoFunction } from '../core'
 
 import { Input, InputProps } from './Input'
 
@@ -15,9 +15,9 @@ export interface InputMaskProps extends Omit<InputProps, 'onChange'> {
 type MaskRef = ReturnType<typeof useIMask>['maskRef']
 type TMask = NonNullable<MaskRef['current']>
 
-export const InputMask = forwardRef<HTMLInputElement, InputMaskProps>((props, ref) => {
+const InputMaskForwarded = forwardRef<HTMLInputElement, InputMaskProps>((props, ref) => {
     const {
-        value,
+        value: outValue,
         maskConfig,
         onChange,
         onComplete,
@@ -26,63 +26,53 @@ export const InputMask = forwardRef<HTMLInputElement, InputMaskProps>((props, re
         ...restProps
     } = props
 
-    const lastCompletedValueRef = useRef<string | null>(null)
-    const [isCompleted, setIsCompleted] = useState(false)
+    const lastCompletedValueRef = useRef<string>(outValue || '')
 
-    const handlerAccept = useCallback((value: UnmaskValue<ReactMaskOpts>, mask: TMask, event?: InputEvent) => {
+    const handlerAccept = useMemoFunction((value: UnmaskValue<ReactMaskOpts>, mask: TMask, event?: InputEvent) => {
         onChange?.(value, event)
 
         if (!value) {
+            lastCompletedValueRef.current = ''
             onComplete?.(value, event)
         }
-    }, [onChange, onComplete])
+    })
 
-    const handleComplete = useCallback((value: UnmaskValue<ReactMaskOpts>, mask: TMask, event?: InputEvent) => {
+    const handleComplete = useMemoFunction((value: UnmaskValue<ReactMaskOpts>, mask: TMask, event?: InputEvent) => {
         lastCompletedValueRef.current = value
-
         onComplete?.(value, event)
-        setIsCompleted(true)
-    }, [onComplete])
+    })
 
     const {
         ref: internalRef,
         value: maskedValue,
         setValue,
-        maskRef,
     } = useIMask(maskConfig, {
         onAccept: handlerAccept,
         onComplete: handleComplete,
     })
 
-    const onReset = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    const onReset = useMemoFunction((event: MouseEvent<HTMLButtonElement>) => {
+        lastCompletedValueRef.current = ''
         setValue('')
 
-        lastCompletedValueRef.current = null
         onResetExternal?.(event)
-    }, [setValue, onResetExternal])
+    })
 
-    const handleBlur = useCallback((event: FocusEvent<HTMLInputElement>) => {
-        if (maskRef.current?.masked.value && !maskRef.current?.masked.isComplete) {
-            setValue(lastCompletedValueRef.current || '')
-        }
+    const handleBlur = useMemoFunction((event: FocusEvent<HTMLInputElement>) => {
+        setValue(lastCompletedValueRef.current)
 
         onBlur?.(event)
-    }, [maskRef, onBlur, setValue])
+    })
 
     useEffect(() => {
-        if ((typeof value === 'string' || value === null)) {
-            setValue(value || '')
-            setIsCompleted(false)
+        if (outValue && typeof outValue === 'string') {
+            lastCompletedValueRef.current = outValue
+            setValue(outValue)
+        } else {
+            lastCompletedValueRef.current = ''
+            setValue('')
         }
-    }, [setValue, value, isCompleted])
-
-    // Убран useEffect так как не понятно в чем была причина добавления этого кода. Если вдруг чего поломается. Можно попробовать вернуть
-    // useEffect(() => {
-    //     if (internalRef.current) {
-    //         // @ts-ignore
-    //         internalRef.current.value = maskedValue
-    //     }
-    // }, [internalRef, maskedValue])
+    }, [setValue, outValue])
 
     return (
         <Input
@@ -96,5 +86,7 @@ export const InputMask = forwardRef<HTMLInputElement, InputMaskProps>((props, re
 })
 
 export const Mask = IMask
+
+export const InputMask = memo(InputMaskForwarded)
 
 InputMask.displayName = 'InputMask'

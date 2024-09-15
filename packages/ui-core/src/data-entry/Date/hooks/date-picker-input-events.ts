@@ -1,5 +1,6 @@
-import { FocusEvent, useCallback, useEffect, useRef, useState, MutableRefObject, RefObject } from 'react'
+import { FocusEvent, useEffect, useRef, useState, MutableRefObject, RefObject } from 'react'
 
+import { useMemoFunction } from '../../../core'
 import { getActiveElement } from '../../../utils/get-active-dom-node'
 
 type CalendarInputEventsConfig = {
@@ -16,7 +17,7 @@ export const useDatePickerInputEvents = (
     const [isPreventFocusEvent, setIsPreventFocusEvent] = useState(false)
     const isInit = useRef(false)
 
-    const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    const handleKeyDown = useMemoFunction((event: KeyboardEvent) => {
         const isInputFocus = calendarElem.current?.contains(getActiveElement())
 
         if ((event.key === 'Enter' || event.code === 'Space') && isInputFocus) {
@@ -25,29 +26,29 @@ export const useDatePickerInputEvents = (
 
             onEnterKeyDown?.()
         }
-    }, [calendarElem, onEnterKeyDown])
+    })
 
-    const handleFocus = useCallback(() => {
+    const handleFocus = useMemoFunction(() => {
         if (isPreventFocusEvent) { return }
 
         setIsPreventFocusEvent(true)
         onFocus?.()
 
         window?.addEventListener('keydown', handleKeyDown)
-    }, [handleKeyDown, onFocus, isPreventFocusEvent])
+    })
 
-    const onBlurEvent = useCallback((event?: FocusEvent<HTMLInputElement>) => {
+    const onBlurEvent = useMemoFunction((event?: FocusEvent<HTMLInputElement>) => {
         setIsPreventFocusEvent(false)
         onBlur?.(event)
 
         window?.removeEventListener('keydown', handleKeyDown)
-    }, [handleKeyDown, onBlur])
+    })
 
-    const handleBlur = useCallback((event: FocusEvent<HTMLInputElement>) => {
+    const handleBlur = useMemoFunction((event: FocusEvent<HTMLInputElement>) => {
         if (calendarOpen) { return }
 
         onBlurEvent(event)
-    }, [calendarOpen, onBlurEvent])
+    })
 
     useEffect(() => {
         if (!isInit.current) {

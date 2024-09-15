@@ -1,10 +1,10 @@
-import { FocusEvent, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { FocusEvent, forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import classNames from 'classnames'
 import { ReactMaskOpts } from 'react-imask/mixin'
 
-import { CalendarIcon, ComponentBaseProps, useConfigProvider } from '../../../core'
+import { CalendarIcon, ComponentBaseProps, useConfigProvider, useForwardedRef, useMemoFunction } from '../../../core'
 import { Calendar } from '../../../data-display/Calendar/Calendar'
 import { InputProps } from '../../Input'
 import { Popover } from '../../../data-display/Popover'
@@ -16,7 +16,6 @@ import { getValidDayjs, type DateAccuracy, getDateAccuracy, cutDateByAccuracy } 
 import { DATE_FORMAT, OUTPUT_FORMAT, TODAY } from '../../const'
 import { useDatePickerInputEvents } from '../hooks/date-picker-input-events'
 import { FocusTrap } from '../../../core/components/focus-trap'
-import { useForwardedRef } from '../../../core/hooks'
 
 import { useHandleInputCompleteHook } from './hooks/handle-input-complete.hook'
 
@@ -57,7 +56,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
         dateFormat = DATE_FORMAT,
         timeFormat,
         style,
-        suffixIcon = <CalendarIcon />,
+        suffixIcon,
         visible = true,
         getContainer,
         maskConfig,
@@ -71,13 +70,13 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
 
     const [calendarOpen, setCalendarOpen] = useState(false)
 
-    const onOpenCalendar = useCallback(() => {
+    const onOpenCalendar = useMemoFunction(() => {
         setCalendarOpen(true)
-    }, [])
+    })
 
-    const onCloseCalendar = useCallback(() => {
+    const onCloseCalendar = useMemoFunction(() => {
         setCalendarOpen(false)
-    }, [])
+    })
 
     const { getPrefix } = useConfigProvider()
     const prefixCls = getPrefix(prefix)
@@ -114,7 +113,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
 
     // #region calendar handlers
 
-    const handleSelectDate = useCallback<HandleSelectDate>((newDate, { changedType }) => {
+    const handleSelectDate = useMemoFunction<HandleSelectDate>((newDate, { changedType }) => {
         let newValue = getValidDayjs(newDate)
 
         if (newValue && minDate && newValue < minDate) {
@@ -133,7 +132,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
         }
 
         onChange(date)
-    }, [onChange, onCloseCalendar, minDate, maxDate])
+    })
 
     // #endregion
 
@@ -149,10 +148,10 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
         },
     )
 
-    const onFocusCallback = useCallback((event: FocusEvent<HTMLInputElement, Element>) => {
+    const onFocusCallback = useMemoFunction((event: FocusEvent<HTMLInputElement, Element>) => {
         onOpenCalendar()
         onFocus?.(event)
-    }, [onOpenCalendar, onFocus])
+    })
 
     const {
         handleFocus,
@@ -181,6 +180,12 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
         minDate: minDate?.toDate(),
         maxDate: maxDate?.toDate(),
     }), [minDate, maxDate])
+
+    const suffixIconFinal = useMemo(() => (
+        <div className={`${prefixCls}-datepicker__suffix-icon-button`}>
+            {suffixIcon === undefined ? <CalendarIcon /> : suffixIcon}
+        </div>
+    ), [prefixCls, suffixIcon])
 
     return (
         visible ? (
@@ -227,11 +232,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
                         onBlur={handleBlur}
                         onFocus={handleFocus}
                         onComplete={handleComplete}
-                        suffixIcon={(
-                            <div className={`${prefixCls}-datepicker__suffix-icon-button`}>
-                                {suffixIcon}
-                            </div>
-                        )}
+                        suffixIcon={suffixIconFinal}
                         className={classNames('datepicker__input')}
                         prefix={prefixCls}
                         disabled={disabled || readOnly}
