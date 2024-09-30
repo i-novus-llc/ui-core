@@ -18,8 +18,6 @@ import { ComponentBaseProps, useConfigProvider } from '../core'
 import { useComposeRef } from '../core/hooks/useComposeRef'
 import { Icon } from '../data-display/Icon'
 
-const INPUT_AUTOCOMPLETE = navigator.userAgent.includes('YaBrowser') ? 'none' : 'off'
-
 export interface AbstractInputProps<Value = unknown, InputType = HTMLInputElement> {
     autoComplete?: string,
     id?: string,
@@ -155,7 +153,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
                 <input
                     {...restProps}
                     id={`${targetId}`}
-                    autoComplete={autoComplete || INPUT_AUTOCOMPLETE}
+                    autoComplete={autoComplete || 'off'}
                     ref={composedRef}
                     className={`${prefixCls}-input`}
                     readOnly={readOnly}
