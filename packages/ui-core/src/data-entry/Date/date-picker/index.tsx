@@ -164,6 +164,12 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
             onEnterKeyDown: onOpenCalendar,
             onBlur,
         },
+        {
+            minDate,
+            maxDate,
+            dateFormat,
+            value,
+        },
     )
 
     useEffect(() => {

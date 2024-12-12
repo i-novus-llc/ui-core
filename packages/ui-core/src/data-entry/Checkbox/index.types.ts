@@ -6,7 +6,7 @@ import { AbstractInputProps } from '../Input'
 export type CheckboxValueType = any
 
 export interface CheckboxProps extends ComponentBaseProps,
-    Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'id'>,
+    Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'id' | 'onBlur'>,
     Omit<AbstractInputProps<any>, 'autoComplete'> {
     checked?: boolean
     defaultChecked?: boolean // Выбран ли по дефолту

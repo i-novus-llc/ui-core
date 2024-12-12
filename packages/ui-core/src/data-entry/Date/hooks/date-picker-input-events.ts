@@ -1,4 +1,5 @@
 import { FocusEvent, useEffect, useRef, useState, MutableRefObject, RefObject } from 'react'
+import dayjs, { Dayjs } from 'dayjs'
 
 import { useMemoFunction } from '../../../core'
 import { getActiveElement } from '../../../utils/get-active-dom-node'
@@ -9,10 +10,18 @@ type CalendarInputEventsConfig = {
     onFocus?: Function
 }
 
+type DateRangeOptions = {
+    maxDate?: Dayjs | null,
+    minDate?: Dayjs | null,
+    dateFormat?: string,
+    value?: Date | string | null,
+}
+
 export const useDatePickerInputEvents = (
     calendarOpen: boolean,
     calendarElem: MutableRefObject<HTMLElement> | RefObject<HTMLElement>,
     { onFocus, onBlur, onEnterKeyDown }: CalendarInputEventsConfig,
+    dateRangeOptions?: DateRangeOptions,
 ) => {
     const [isPreventFocusEvent, setIsPreventFocusEvent] = useState(false)
     const isInit = useRef(false)
@@ -44,7 +53,14 @@ export const useDatePickerInputEvents = (
         window?.removeEventListener('keydown', handleKeyDown)
     })
 
-    const handleBlur = useMemoFunction((event: FocusEvent<HTMLInputElement>) => {
+    const handleBlur = useMemoFunction((event: FocusEvent<HTMLInputElement>, setValue) => {
+        const { maxDate, minDate, dateFormat, value } = dateRangeOptions || {}
+        const date = dayjs(event.target.value, dateFormat)
+
+        if (date.isAfter(maxDate) || date.isBefore(minDate)) {
+            setValue(dayjs(value).format(dateFormat))
+        }
+
         if (calendarOpen) { return }
 
         onBlurEvent(event)
