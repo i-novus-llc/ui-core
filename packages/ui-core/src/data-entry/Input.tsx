@@ -10,6 +10,7 @@ import {
     useMemo,
     useState,
     useEffect,
+    Dispatch,
 } from 'react'
 import classNames from 'classnames'
 import { v4 as generateId } from 'uuid'
@@ -23,7 +24,7 @@ export interface AbstractInputProps<Value = unknown, InputType = HTMLInputElemen
     id?: string,
     name?: string
 
-    onBlur?(event: FocusEvent<InputType>): void,
+    onBlur?(event: FocusEvent<InputType>, setValue?: Dispatch<string>): void,
     onChange?(value: Value, event?: ChangeEvent<InputType>): void,
     onFocus?(event: FocusEvent<InputType>): void,
 

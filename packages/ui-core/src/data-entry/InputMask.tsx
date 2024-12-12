@@ -61,7 +61,7 @@ const InputMaskForwarded = forwardRef<HTMLInputElement, InputMaskProps>((props, 
     const handleBlur = useMemoFunction((event: FocusEvent<HTMLInputElement>) => {
         setValue(lastCompletedValueRef.current)
 
-        onBlur?.(event)
+        onBlur?.(event, setValue)
     })
 
     useEffect(() => {
