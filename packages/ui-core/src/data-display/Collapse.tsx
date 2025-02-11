@@ -12,6 +12,7 @@ export interface CollapseProps extends ComponentBaseProps, HTMLAttributes<HTMLDi
     icon?: ReactNode,
     onToggle?(open: boolean, event: SyntheticEvent): void,
     open?: boolean
+    forceRender?: boolean
 }
 
 export const Collapse = forwardRef<HTMLDivElement, CollapseProps>((props, ref) => {
@@ -26,6 +27,7 @@ export const Collapse = forwardRef<HTMLDivElement, CollapseProps>((props, ref) =
         contentIndented = true,
         icon,
         prefix,
+        forceRender = false,
         ...restProps
     } = props
 
@@ -81,8 +83,11 @@ export const Collapse = forwardRef<HTMLDivElement, CollapseProps>((props, ref) =
                 {header}
             </div>
 
-            {open && (
-                <div className={`${prefixCls}-collapse__panel`}>
+            {(open || forceRender) && (
+                <div
+                    className={`${prefixCls}-collapse__panel`}
+                    style={forceRender && !open ? { display: 'none' } : undefined}
+                >
                     {children}
                 </div>
             )}
