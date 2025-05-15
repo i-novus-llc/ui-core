@@ -40,6 +40,7 @@ export const DropdownInput = forwardRef<HTMLInputElement, DropdownInputProps<unk
         type,
         value,
         disableInput = false,
+        getContainer,
         onChange,
         onKeyDown,
         ...inputProps
@@ -137,6 +138,7 @@ export const DropdownInput = forwardRef<HTMLInputElement, DropdownInputProps<unk
         >
             <Popover
                 closeOnEsc
+                getContainer={getContainer}
                 returnFocusRef={returnFocusElementRef}
                 ref={popoverRef}
                 afterShow={onOpenDropdown}
