@@ -98,6 +98,7 @@ export type DropdownInputProps<TValue> = Omit<BaseDropdownProps<TValue>, 'onChan
     selectedInputValue?: unknown,
     type?: string,
     value?: string
+    getContainer?(): Element,
 }
 
 export type MultipleSelectorProps<TValue> = DropdownInputProps<TValue> & {
