@@ -167,7 +167,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
         {
             minDate,
             maxDate,
-            dateFormat,
+            fullFormat,
             value,
         },
     )
