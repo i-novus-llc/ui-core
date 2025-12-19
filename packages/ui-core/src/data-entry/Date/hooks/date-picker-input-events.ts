@@ -13,7 +13,7 @@ type CalendarInputEventsConfig = {
 type DateRangeOptions = {
     maxDate?: Dayjs | null,
     minDate?: Dayjs | null,
-    dateFormat?: string,
+    fullFormat?: string,
     value?: Date | string | null,
 }
 
@@ -54,11 +54,11 @@ export const useDatePickerInputEvents = (
     })
 
     const handleBlur = useMemoFunction((event: FocusEvent<HTMLInputElement>, setValue) => {
-        const { maxDate, minDate, dateFormat, value } = dateRangeOptions || {}
-        const date = dayjs(event.target.value, dateFormat)
+        const { maxDate, minDate, fullFormat, value } = dateRangeOptions || {}
+        const date = dayjs(event.target.value, fullFormat)
 
         if (date.isAfter(maxDate) || date.isBefore(minDate)) {
-            setValue(dayjs(value).format(dateFormat))
+            setValue(dayjs(value).format(fullFormat))
         }
 
         if (calendarOpen) { return }
