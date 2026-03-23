@@ -40,6 +40,7 @@ export const Tooltip = forwardRef<HTMLElement, ITooltipProps>((props, ref) => {
         content,
         contentWrapperRef,
         isOpen,
+        defaultIsOpen = false,
         setIsOpen,
         activeAnchor,
         setActiveAnchor,
@@ -50,13 +51,13 @@ export const Tooltip = forwardRef<HTMLElement, ITooltipProps>((props, ref) => {
 
     const tooltipRef = useRef<HTMLElement>(null)
     const tooltipArrowRef = useRef<HTMLElement>(null)
-    const tooltipShowDelayTimerRef = useRef<NodeJS.Timeout | null>(null)
-    const tooltipHideDelayTimerRef = useRef<NodeJS.Timeout | null>(null)
+    const tooltipShowDelayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const tooltipHideDelayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const [actualPlacement, setActualPlacement] = useState(place)
     const [inlineStyles, setInlineStyles] = useState({})
     const [inlineArrowStyles, setInlineArrowStyles] = useState({})
-    const [show, setShow] = useState(false)
-    const [rendered, setRendered] = useState(false)
+    const [show, setShow] = useState(defaultIsOpen)
+    const [rendered, setRendered] = useState(defaultIsOpen)
     const wasShowing = useRef(false)
     const lastFloatPosition = useRef<TooltipPosition | null>(null)
     const { anchorRefs, setActiveAnchor: setProviderActiveAnchor } = useTooltip(id)
