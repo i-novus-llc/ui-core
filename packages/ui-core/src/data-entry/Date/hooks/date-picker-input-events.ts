@@ -1,4 +1,4 @@
-import { FocusEvent, useEffect, useRef, useState, MutableRefObject, RefObject } from 'react'
+import { FocusEvent, useState, MutableRefObject, RefObject } from 'react'
 import dayjs, { Dayjs } from 'dayjs'
 
 import { useMemoFunction } from '../../../core'
@@ -18,13 +18,12 @@ type DateRangeOptions = {
 }
 
 export const useDatePickerInputEvents = (
-    calendarOpen: boolean,
+    isCalendarOpen: MutableRefObject<boolean>,
     calendarElem: MutableRefObject<HTMLElement> | RefObject<HTMLElement>,
     { onFocus, onBlur, onEnterKeyDown }: CalendarInputEventsConfig,
     dateRangeOptions?: DateRangeOptions,
 ) => {
     const [isPreventFocusEvent, setIsPreventFocusEvent] = useState(false)
-    const isInit = useRef(false)
 
     const handleKeyDown = useMemoFunction((event: KeyboardEvent) => {
         const isInputFocus = calendarElem.current?.contains(getActiveElement())
@@ -61,24 +60,12 @@ export const useDatePickerInputEvents = (
             setValue(dayjs(value).format(fullFormat))
         }
 
-        if (calendarOpen) { return }
+        setTimeout(() => {
+            if (isCalendarOpen.current) { return }
 
-        onBlurEvent(event)
+            onBlurEvent(event)
+        }, 150)
     })
-
-    useEffect(() => {
-        if (!isInit.current) {
-            isInit.current = true
-
-            return
-        }
-
-        const isFireOnBlur = isInit.current && !calendarElem.current?.contains(getActiveElement())
-
-        if (isFireOnBlur) {
-            onBlurEvent()
-        }
-    }, [calendarOpen, onBlur, calendarElem, onBlurEvent])
 
     return ({
         handleFocus,
