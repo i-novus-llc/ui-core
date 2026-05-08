@@ -1,4 +1,4 @@
-import { FocusEvent, forwardRef, useEffect, useMemo, useRef, useState } from 'react'
+import { FocusEvent, forwardRef, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import classNames from 'classnames'
@@ -69,6 +69,11 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
     dateAccuracyRef.current = getDateAccuracy(dateFormat, timeFormat)
 
     const [calendarOpen, setCalendarOpen] = useState(false)
+    const isCalendarOpen = useRef(calendarOpen)
+
+    useLayoutEffect(() => {
+        isCalendarOpen.current = calendarOpen
+    }, [calendarOpen])
 
     const onOpenCalendar = useMemoFunction(() => {
         setCalendarOpen(true)
@@ -157,7 +162,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
         handleFocus,
         handleBlur,
     } = useDatePickerInputEvents(
-        calendarOpen,
+        isCalendarOpen,
         inputRef,
         {
             onFocus: onFocusCallback,

@@ -68,8 +68,6 @@ export const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps
         getContainer,
         ...restProps
     } = props
-    const isCalendarOpen = useRef(false)
-
     const inputRef = useForwardedRef<HTMLInputElement>(ref)
     const containerRef = useRef<HTMLDivElement>(null)
 
@@ -118,6 +116,8 @@ export const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps
     const [calendarOpen, setCalendarOpen] = useState(false)
     const [beginMaxDate, setBeginMaxDate] = useState(calendarValue.end || maxDate?.toDate())
     const [endMinDate, setEndMinDate] = useState(calendarValue.begin || minDate?.toDate())
+
+    const isCalendarOpen = useRef(calendarOpen)
 
     const onOpenCalendar = useCallback(() => {
         setCalendarOpen(true)
@@ -198,7 +198,7 @@ export const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps
         handleFocus,
         handleBlur,
     } = useDatePickerInputEvents(
-        calendarOpen,
+        isCalendarOpen,
         inputRef,
         {
             onFocus: onFocusCallback,
