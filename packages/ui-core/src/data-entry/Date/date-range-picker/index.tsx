@@ -197,6 +197,7 @@ export const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps
     const {
         handleFocus,
         handleBlur,
+        onBlurEvent,
     } = useDatePickerInputEvents(
         isCalendarOpen,
         inputRef,
@@ -205,6 +206,7 @@ export const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps
             onEnterKeyDown: onOpenCalendar,
             onBlur,
         },
+        { isInterval: true },
     )
 
     // #endregion
@@ -218,6 +220,14 @@ export const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps
             parentElement?.removeEventListener('scroll', onOpenCalendar)
         }
     }, [parentId, onOpenCalendar])
+
+    const onOpenChange = (open: boolean) => {
+        setCalendarOpen(open)
+
+        if (!open) {
+            onBlurEvent?.()
+        }
+    }
 
     return (
         visible ? (
@@ -238,7 +248,7 @@ export const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps
                     disabled={disabled}
                     readOnly={readOnly}
                     open={calendarOpen}
-                    onOpenChange={setCalendarOpen}
+                    onOpenChange={onOpenChange}
                     placement={placement}
                     className={classNames(popupClassName, `${prefixCls}-date-range-picker-popover`)}
                     getContainer={getContainer}

@@ -1,6 +1,7 @@
 import { FocusEvent, useState, MutableRefObject, RefObject } from 'react'
 import dayjs, { Dayjs } from 'dayjs'
 
+import { INTERVAL_SEPARATOR } from '../../const'
 import { useMemoFunction } from '../../../core'
 import { getActiveElement } from '../../../utils/get-active-dom-node'
 
@@ -15,6 +16,7 @@ type DateRangeOptions = {
     minDate?: Dayjs | null,
     fullFormat?: string,
     value?: Date | string | null,
+    isInterval?: boolean,
 }
 
 export const useDatePickerInputEvents = (
@@ -53,10 +55,21 @@ export const useDatePickerInputEvents = (
     })
 
     const handleBlur = useMemoFunction((event: FocusEvent<HTMLInputElement>, setValue) => {
-        const { maxDate, minDate, fullFormat, value } = dateRangeOptions || {}
+        const { maxDate, minDate, fullFormat, value, isInterval } = dateRangeOptions || {}
         const date = dayjs(event.target.value, fullFormat)
 
-        if (date.isAfter(maxDate) || date.isBefore(minDate)) {
+        if (isInterval) {
+            const rawValue = event.target.value
+            const parts = rawValue.split(INTERVAL_SEPARATOR)
+
+            const [beginStr, endStr] = parts.map(p => p.trim())
+            const beginDate = dayjs(beginStr, fullFormat)
+            const endDate = dayjs(endStr, fullFormat)
+
+            if (parts.length === 2 && beginDate.isValid() && endDate.isValid()) {
+                setValue(dayjs(value || '').format(fullFormat))
+            }
+        } else if (date.isAfter(maxDate) || date.isBefore(minDate)) {
             setValue(dayjs(value).format(fullFormat))
         }
 
@@ -70,5 +83,6 @@ export const useDatePickerInputEvents = (
     return ({
         handleFocus,
         handleBlur,
+        onBlurEvent,
     })
 }
