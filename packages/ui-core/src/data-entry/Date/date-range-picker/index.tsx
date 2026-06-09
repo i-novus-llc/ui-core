@@ -206,7 +206,7 @@ export const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps
             onEnterKeyDown: onOpenCalendar,
             onBlur,
         },
-        { isInterval: true },
+        { isInterval: true, value: inputValue, fullFormat, maxDate, minDate },
     )
 
     // #endregion
