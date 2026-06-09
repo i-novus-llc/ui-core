@@ -54,29 +54,43 @@ export const useDatePickerInputEvents = (
         window?.removeEventListener('keydown', handleKeyDown)
     })
 
+    const checkIsInvalid = (
+        rawValue: string,
+        fullFormat: string,
+        minDate?: Dayjs | null,
+        maxDate?: Dayjs | null,
+        isInterval?: boolean,
+    ) => {
+        if (isInterval) {
+            const parts = rawValue.split(INTERVAL_SEPARATOR).map(p => p.trim())
+
+            if (parts.length !== 2) { return false }
+
+            const [begin, end] = parts.map(p => dayjs(p, fullFormat))
+
+            return begin?.isValid() && end?.isValid() &&
+                ((minDate && begin.isBefore(minDate)) || (maxDate && end.isAfter(maxDate)))
+        }
+        const date = dayjs(rawValue, fullFormat)
+
+        return date.isValid() && (date.isAfter(maxDate) || date.isBefore(minDate))
+    }
+
     const handleBlur = useMemoFunction((event: FocusEvent<HTMLInputElement>, setValue) => {
         const { maxDate, minDate, fullFormat, value, isInterval } = dateRangeOptions || {}
-        const date = dayjs(event.target.value, fullFormat)
+        const rawValue = event.target.value
 
-        if (isInterval) {
-            const rawValue = event.target.value
-            const parts = rawValue.split(INTERVAL_SEPARATOR)
-
-            const [beginStr, endStr] = parts.map(p => p.trim())
-            const beginDate = dayjs(beginStr, fullFormat)
-            const endDate = dayjs(endStr, fullFormat)
-
-            if (parts.length === 2 && beginDate.isValid() && endDate.isValid()) {
-                setValue(dayjs(value || '').format(fullFormat))
+        if (checkIsInvalid(rawValue, fullFormat as string, minDate, maxDate, isInterval)) {
+            if (isInterval) {
+                // сброс до валидного значения
+                setValue(value)
+            } else {
+                setValue(dayjs(value).format(fullFormat))
             }
-        } else if (date.isAfter(maxDate) || date.isBefore(minDate)) {
-            setValue(dayjs(value).format(fullFormat))
         }
 
         setTimeout(() => {
-            if (isCalendarOpen.current) { return }
-
-            onBlurEvent(event)
+            if (!isCalendarOpen.current) { onBlurEvent(event) }
         }, 150)
     })
 
